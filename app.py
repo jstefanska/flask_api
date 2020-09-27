@@ -18,7 +18,7 @@ def add_hashtag():
     else:
         try:
             if 'DB_PASS' not in os.environ:
-                abort(make_response(jsonify(message="'DB_PASS' environment variable does not exist"), 409))
+                abort(make_response(jsonify(message="'DB_PASS' environment variable does not exist"), 400))
             else:
                 db_pass = os.getenv('DB_PASS')
 
