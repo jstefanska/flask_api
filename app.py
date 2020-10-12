@@ -7,6 +7,11 @@ import os
 app = Flask(__name__)
 
 
+@app.route("/")
+def hello():
+    return "Hello World!"
+
+
 @app.route('/hashtag', methods=['POST'])
 def add_hashtag():
     data = json.loads(request.data)
@@ -75,6 +80,4 @@ def get_hashtag(hashtag):
 
 
 if __name__ == '__main__':
-    app.run(
-        debug=True
-    )
+    app.run(host='0.0.0.0', port=8080, debug=True)
