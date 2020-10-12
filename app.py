@@ -29,7 +29,7 @@ def add_hashtag():
             cur = conn.cursor()
 
             query = sql.SQL("INSERT INTO public.hashtags (hashtag) VALUES (%s)").format()
-            cur.execute(query, (hashtag, ))
+            cur.execute(query, (hashtag,))
 
             cur.close()
             conn.close()
@@ -58,7 +58,7 @@ def get_hashtag(hashtag):
         cur = conn.cursor()
 
         query = sql.SQL("SELECT * FROM public.twitter WHERE hashtag = %s ORDER BY id DESC LIMIT 10").format()
-        cur.execute(query, (hashtag, ))
+        cur.execute(query, (hashtag,))
         tweets_columns = cur.fetchall()
         cur.close()
         conn.close()
@@ -72,3 +72,9 @@ def get_hashtag(hashtag):
 
     except psycopg2.OperationalError:
         abort(make_response(jsonify(message="Unable to connect to the database!"), 502))
+
+
+if __name__ == '__main__':
+    app.run(
+        debug=True
+    )
