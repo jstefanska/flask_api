@@ -28,7 +28,7 @@ def add_hashtag():
 
             db_pass = os.getenv('DB_PASS')
 
-            conn = psycopg2.connect(host='localhost', port=5432, dbname='postgres', user='postgres',
+            conn = psycopg2.connect(host='localhost', port=5432, dbname='postgres', user='postgres_user',
                                     password=db_pass)
             conn.autocommit = True
             cur = conn.cursor()
@@ -57,7 +57,7 @@ def get_hashtag(hashtag):
 
         db_pass = os.getenv('DB_PASS')
 
-        conn = psycopg2.connect(host='localhost', port=5432, dbname='postgres', user='postgres',
+        conn = psycopg2.connect(host='localhost', port=5432, dbname='postgres', user='postgres_user',
                                 password=db_pass)
         conn.autocommit = True
         cur = conn.cursor()
