@@ -3,11 +3,17 @@ import json
 import psycopg2
 from psycopg2 import sql
 import os
+from flask_swagger import swagger
 
 app = Flask(__name__)
 
 
 @app.route("/")
+def spec():
+    return jsonify(swagger(app))
+
+
+@app.route("/hello")
 def hello():
     return "Hello World!"
 
