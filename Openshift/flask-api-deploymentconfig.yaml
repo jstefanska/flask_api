@@ -1,0 +1,106 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftWebConsole
+  creationTimestamp: '2020-10-16T15:12:53Z'
+  generation: 9
+  labels:
+    app: flask-api
+  name: flask-api
+  namespace: twitter-project
+  resourceVersion: '42943'
+  selfLink: >-
+    /apis/apps.openshift.io/v1/namespaces/twitter-project/deploymentconfigs/flask-api
+  uid: 1058185f-0fc2-11eb-baf9-00155d380107
+spec:
+  replicas: 1
+  selector:
+    deploymentconfig: flask-api
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: flask-api
+        deploymentconfig: flask-api
+    spec:
+      containers:
+        - env:
+            - name: DB_PASS
+              value: 
+            - name: DB_HOST
+              value:
+            - name: DB_NAME
+              value:
+            - name: DB_USER
+              value:
+            - name: DB_PORT
+              value:
+          image: >-
+            172.30.1.1:5000/twitter-project/flask-api@sha256:b0711b0a3209123822f35cfe2fa9220bb3f5b95e543c6b085f8bbc82a9eb3856
+          imagePullPolicy: Always
+          name: flask-api
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+  test: false
+  triggers:
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - flask-api
+        from:
+          kind: ImageStreamTag
+          name: 'flask-api:latest'
+          namespace: twitter-project
+        lastTriggeredImage: >-
+          172.30.1.1:5000/twitter-project/flask-api@sha256:b0711b0a3209123822f35cfe2fa9220bb3f5b95e543c6b085f8bbc82a9eb3856
+      type: ImageChange
+    - type: ConfigChange
+status:
+  availableReplicas: 1
+  conditions:
+    - lastTransitionTime: '2020-10-17T12:41:48Z'
+      lastUpdateTime: '2020-10-17T12:41:48Z'
+      message: Deployment config has minimum availability.
+      status: 'True'
+      type: Available
+    - lastTransitionTime: '2020-10-17T13:03:34Z'
+      lastUpdateTime: '2020-10-17T13:03:39Z'
+      message: replication controller "flask-api-8" successfully rolled out
+      reason: NewReplicationControllerAvailable
+      status: 'True'
+      type: Progressing
+  details:
+    causes:
+      - imageTrigger:
+          from:
+            kind: DockerImage
+            name: >-
+              172.30.1.1:5000/twitter-project/flask-api@sha256:b0711b0a3209123822f35cfe2fa9220bb3f5b95e543c6b085f8bbc82a9eb3856
+        type: ImageChange
+    message: image change
+  latestVersion: 8
+  observedGeneration: 9
+  readyReplicas: 1
+  replicas: 1
+  unavailableReplicas: 0
+  updatedReplicas: 1
