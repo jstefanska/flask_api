@@ -1,9 +1,7 @@
 from flask import Flask, abort, make_response, jsonify, request
 import json
-import psycopg2
-from psycopg2 import sql
-import os
 from flask_swagger import swagger
+import redis
 
 app = Flask(__name__)
 
@@ -11,11 +9,6 @@ app = Flask(__name__)
 @app.route("/")
 def spec():
     return jsonify(swagger(app))
-
-
-@app.route("/hello")
-def hello():
-    return "Hello World!"
 
 
 @app.route('/hashtag', methods=['POST'])
@@ -27,92 +20,115 @@ def add_hashtag():
         abort(make_response(jsonify(message="Use a word without '#'. Application will take care of that."), 400))
     else:
         try:
-            if 'DB_PASS' not in os.environ:
-                print("'DB_PASS' environment variable does not exist")
-                exit(1)
-            elif 'DB_HOST' not in os.environ:
-                print("'DB_HOST' environment variable does not exist")
-                exit(1)
-            elif 'DB_NAME' not in os.environ:
-                print("'DB_NAME' environment variable does not exist")
-                exit(1)
-            elif 'DB_USER' not in os.environ:
-                print("'DB_USER' environment variable does not exist")
-                exit(1)
-            elif 'DB_PORT' not in os.environ:
-                print("'DB_PORT' environment variable does not exist")
-                exit(1)
-            else:
-                db_pass = os.getenv('DB_PASS')
-                db_host = os.getenv('DB_HOST')
-                db_name = os.getenv('DB_NAME')
-                db_user = os.getenv('DB_USER')
-                db_port = os.getenv('DB_PORT')
+            # if 'DB_PASS' not in os.environ:
+            #     print("'DB_PASS' environment variable does not exist")
+            #     exit(1)
+            # elif 'DB_HOST' not in os.environ:
+            #     print("'DB_HOST' environment variable does not exist")
+            #     exit(1)
+            # elif 'DB_PORT' not in os.environ:
+            #     print("'DB_PORT' environment variable does not exist")
+            #     exit(1)
+            # else:
+            #     db_pass = os.getenv('DB_PASS')
+            #     db_host = os.getenv('DB_HOST')
+            #     db_port = os.getenv('DB_PORT')
 
-            conn = psycopg2.connect(host=db_host, port=db_port, dbname=db_name, user=db_user,
-                                    password=db_pass)
-            conn.autocommit = True
-            cur = conn.cursor()
+            r = redis.StrictRedis(
+                host='localhost',
+                port=6379,
+                password='mysecretpassword',
+                charset="utf-8",
+                decode_responses=True)
 
-            query = sql.SQL("INSERT INTO public.hashtags (hashtag) VALUES (%s)").format()
-            cur.execute(query, (hashtag,))
+            r.sadd('hashtags', hashtag)
 
-            cur.close()
-            conn.close()
-            return "Rows updated with hashtag: " + str(hashtag)
+            return "Database updated with hashtag: " + str(hashtag)
 
-        except psycopg2.OperationalError:
+        except ConnectionError:
             abort(make_response(jsonify(message="Unable to connect to the database!"), 502))
 
-        except psycopg2.errors.UniqueViolation:
-            abort(make_response(jsonify(message="Hashtag already exists in database."), 409))
+        except redis.exceptions.ResponseError as ex:
+            error_message = "Error: " + str(ex)
+            abort(make_response(jsonify(message=error_message), 500))
 
 
 @app.route('/tweets/<string:hashtag>', methods=['GET'])
-def get_hashtag(hashtag):
+def get_tweets_with_hashtag(hashtag):
     try:
-        if 'DB_PASS' not in os.environ:
-            print("'DB_PASS' environment variable does not exist")
-            exit(1)
-        elif 'DB_HOST' not in os.environ:
-            print("'DB_HOST' environment variable does not exist")
-            exit(1)
-        elif 'DB_NAME' not in os.environ:
-            print("'DB_NAME' environment variable does not exist")
-            exit(1)
-        elif 'DB_USER' not in os.environ:
-            print("'DB_USER' environment variable does not exist")
-            exit(1)
-        elif 'DB_PORT' not in os.environ:
-            print("'DB_PORT' environment variable does not exist")
-            exit(1)
-        else:
-            db_pass = os.getenv('DB_PASS')
-            db_host = os.getenv('DB_HOST')
-            db_name = os.getenv('DB_NAME')
-            db_user = os.getenv('DB_USER')
-            db_port = os.getenv('DB_PORT')
+        # if 'DB_PASS' not in os.environ:
+        #     print("'DB_PASS' environment variable does not exist")
+        #     exit(1)
+        # elif 'DB_HOST' not in os.environ:
+        #     print("'DB_HOST' environment variable does not exist")
+        #     exit(1)
+        # elif 'DB_PORT' not in os.environ:
+        #     print("'DB_PORT' environment variable does not exist")
+        #     exit(1)
+        # else:
+        #     db_pass = os.getenv('DB_PASS')
+        #     db_host = os.getenv('DB_HOST')
+        #     db_port = os.getenv('DB_PORT')
+        r = redis.StrictRedis(
+            host='localhost',
+            port=6379,
+            password='mysecretpassword',
+            charset="utf-8",
+            decode_responses=True)
 
-        conn = psycopg2.connect(host=db_host, port=db_port, dbname=db_name, user=db_user,
-                                password=db_pass)
-        conn.autocommit = True
-        cur = conn.cursor()
-
-        query = sql.SQL("SELECT * FROM public.twitter WHERE hashtag = %s ORDER BY id DESC LIMIT 10").format()
-        cur.execute(query, (hashtag,))
-        tweets_columns = cur.fetchall()
-        cur.close()
-        conn.close()
-
-        tweets_data = [{"tweet_id": column[1], "tweet_content": column[2]} for column in tweets_columns]
+        tweets_data = (r.lrange(hashtag, 0, 9))
 
         if not tweets_data:
             abort(make_response(jsonify(message="Database does not contain tweets with this hashtag."), 400))
         else:
             return jsonify(tweets_data)
 
-    except psycopg2.OperationalError:
+    except ConnectionError:
         abort(make_response(jsonify(message="Unable to connect to the database!"), 502))
+
+    except redis.exceptions.ResponseError as ex:
+        error_message = "Error: " + str(ex)
+        abort(make_response(jsonify(message=error_message), 500))
+
+
+@app.route('/vote', methods=['POST'])
+def vote_tweet_id():
+    data = json.loads(request.data)
+    tweet_id = data.get("value", None)
+
+    try:
+        # if 'DB_PASS' not in os.environ:
+        #     print("'DB_PASS' environment variable does not exist")
+        #     exit(1)
+        # elif 'DB_HOST' not in os.environ:
+        #     print("'DB_HOST' environment variable does not exist")
+        #     exit(1)
+        # elif 'DB_PORT' not in os.environ:
+        #     print("'DB_PORT' environment variable does not exist")
+        #     exit(1)
+        # else:
+        #     db_pass = os.getenv('DB_PASS')
+        #     db_host = os.getenv('DB_HOST')
+        #     db_port = os.getenv('DB_PORT')
+
+        r = redis.StrictRedis(
+            host='localhost',
+            port=6379,
+            password='mysecretpassword',
+            charset="utf-8",
+            decode_responses=True)
+
+        r.incr(tweet_id, 1)
+        votes = r.get(tweet_id)
+
+        return tweet_id + " has " + votes + " votes."
+
+    except ConnectionError:
+        abort(make_response(jsonify(message="Unable to connect to the database!"), 502))
+
+    except redis.exceptions.ResponseError as ex:
+        error_message = "Error: " + str(ex)
+        abort(make_response(jsonify(message=error_message), 500))
 
 
 if __name__ == '__main__':
