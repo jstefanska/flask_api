@@ -2,6 +2,7 @@ from flask import Flask, abort, make_response, jsonify, request
 import json
 from flask_swagger import swagger
 import redis
+import os
 
 app = Flask(__name__)
 
@@ -20,24 +21,24 @@ def add_hashtag():
         abort(make_response(jsonify(message="Use a word without '#'. Application will take care of that."), 400))
     else:
         try:
-            # if 'DB_PASS' not in os.environ:
-            #     print("'DB_PASS' environment variable does not exist")
-            #     exit(1)
-            # elif 'DB_HOST' not in os.environ:
-            #     print("'DB_HOST' environment variable does not exist")
-            #     exit(1)
-            # elif 'DB_PORT' not in os.environ:
-            #     print("'DB_PORT' environment variable does not exist")
-            #     exit(1)
-            # else:
-            #     db_pass = os.getenv('DB_PASS')
-            #     db_host = os.getenv('DB_HOST')
-            #     db_port = os.getenv('DB_PORT')
+            if 'DB_PASS' not in os.environ:
+                print("'DB_PASS' environment variable does not exist")
+                exit(1)
+            elif 'DB_HOST' not in os.environ:
+                print("'DB_HOST' environment variable does not exist")
+                exit(1)
+            elif 'DB_PORT' not in os.environ:
+                print("'DB_PORT' environment variable does not exist")
+                exit(1)
+            else:
+                db_pass = os.getenv('DB_PASS')
+                db_host = os.getenv('DB_HOST')
+                db_port = os.getenv('DB_PORT')
 
             r = redis.StrictRedis(
-                host='localhost',
-                port=6379,
-                password='mysecretpassword',
+                host=db_host,
+                port=db_port,
+                password=db_pass,
                 charset="utf-8",
                 decode_responses=True)
 
@@ -56,23 +57,24 @@ def add_hashtag():
 @app.route('/tweets/<string:hashtag>', methods=['GET'])
 def get_tweets_with_hashtag(hashtag):
     try:
-        # if 'DB_PASS' not in os.environ:
-        #     print("'DB_PASS' environment variable does not exist")
-        #     exit(1)
-        # elif 'DB_HOST' not in os.environ:
-        #     print("'DB_HOST' environment variable does not exist")
-        #     exit(1)
-        # elif 'DB_PORT' not in os.environ:
-        #     print("'DB_PORT' environment variable does not exist")
-        #     exit(1)
-        # else:
-        #     db_pass = os.getenv('DB_PASS')
-        #     db_host = os.getenv('DB_HOST')
-        #     db_port = os.getenv('DB_PORT')
+        if 'DB_PASS' not in os.environ:
+            print("'DB_PASS' environment variable does not exist")
+            exit(1)
+        elif 'DB_HOST' not in os.environ:
+            print("'DB_HOST' environment variable does not exist")
+            exit(1)
+        elif 'DB_PORT' not in os.environ:
+            print("'DB_PORT' environment variable does not exist")
+            exit(1)
+        else:
+            db_pass = os.getenv('DB_PASS')
+            db_host = os.getenv('DB_HOST')
+            db_port = os.getenv('DB_PORT')
+
         r = redis.StrictRedis(
-            host='localhost',
-            port=6379,
-            password='mysecretpassword',
+            host=db_host,
+            port=db_port,
+            password=db_pass,
             charset="utf-8",
             decode_responses=True)
 
@@ -97,31 +99,34 @@ def vote_tweet_id():
     tweet_id = data.get("value", None)
 
     try:
-        # if 'DB_PASS' not in os.environ:
-        #     print("'DB_PASS' environment variable does not exist")
-        #     exit(1)
-        # elif 'DB_HOST' not in os.environ:
-        #     print("'DB_HOST' environment variable does not exist")
-        #     exit(1)
-        # elif 'DB_PORT' not in os.environ:
-        #     print("'DB_PORT' environment variable does not exist")
-        #     exit(1)
-        # else:
-        #     db_pass = os.getenv('DB_PASS')
-        #     db_host = os.getenv('DB_HOST')
-        #     db_port = os.getenv('DB_PORT')
+        if 'DB_PASS' not in os.environ:
+            print("'DB_PASS' environment variable does not exist")
+            exit(1)
+        elif 'DB_HOST' not in os.environ:
+            print("'DB_HOST' environment variable does not exist")
+            exit(1)
+        elif 'DB_PORT' not in os.environ:
+            print("'DB_PORT' environment variable does not exist")
+            exit(1)
+        else:
+            db_pass = os.getenv('DB_PASS')
+            db_host = os.getenv('DB_HOST')
+            db_port = os.getenv('DB_PORT')
 
         r = redis.StrictRedis(
-            host='localhost',
-            port=6379,
-            password='mysecretpassword',
+            host=db_host,
+            port=db_port,
+            password=db_pass,
             charset="utf-8",
             decode_responses=True)
 
         r.incr(tweet_id, 1)
         votes = r.get(tweet_id)
 
-        return tweet_id + " has " + votes + " votes."
+        if int(votes) > 2:
+            return "Tweet with id: " + tweet_id + " has " + votes + " votes."
+        else:
+            return "Tweet with id: " + tweet_id + " has " + votes + " vote."
 
     except ConnectionError:
         abort(make_response(jsonify(message="Unable to connect to the database!"), 502))
