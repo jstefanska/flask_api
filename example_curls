@@ -3,3 +3,9 @@ curl -i -H "Accept: application/json" http://127.0.0.1:5000/tweets/doggo
 
 # POST curl to add hashtag "doggo" for Windows
 curl -i -X POST -H "Content-Type: application/json" -d "{\"value\":\"doggo\"}" http://127.0.0.1:5000/hashtag
+
+# POST curl to vote for Tweet with chosen ID
+curl -i -X POST -H "Content-Type: application/json" -d "{\"value\":\"1234784584443\"}" http://127.0.0.1:5000/vote
+
+
+
