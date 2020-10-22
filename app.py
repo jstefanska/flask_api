@@ -13,11 +13,6 @@ def spec():
     return jsonify(swagger(app))
 
 
-@app.route("/hello")
-def hello():
-    return "Hello World!"
-
-
 @app.route('/hashtag', methods=['POST'])
 def add_hashtag():
     data = json.loads(request.data)
