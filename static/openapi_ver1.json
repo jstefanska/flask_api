@@ -3,7 +3,7 @@
   "info": {
     "version": "1.0.0",
     "title": "Flask API for Twitter client",
-    "description": "An API to POST hashtags, GET tweets and POST tweet_id to vote"
+    "description": "An API to POST hashtags, GET Tweets with previously selected hashtag and POST tweet_id to vote for Tweets."
   },
   "paths": {
     "/hashtag": {
@@ -11,7 +11,7 @@
         "tags": [
           "Hashtag"
         ],
-        "description": "Post Twitter hashtag without \"#\", so that Twitter client can get tweets with this hashtag",
+        "description": "Post Twitter hashtag without \"#\", so that Twitter client can get Tweets with this hashtag.",
         "requestBody": {
           "required": true,
           "content": {
@@ -30,10 +30,10 @@
         },
         "responses": {
           "200": {
-            "description": "Database updated with hashtag"
+            "description": "Database updated with hashtag."
           },
           "502": {
-            "description": "Unable to connect to the database"
+            "description": "Unable to connect to the database."
           }
         }
       }
@@ -43,7 +43,7 @@
         "tags": [
           "Tweets"
         ],
-        "description": "Provide hashtag for Tweet you want to look up, so that Twitter client can get Tweets with this hashtag. It can take one minute between POST request and GET request.",
+        "description": "Provide hashtag for Tweet you want to look up, so that Twitter client can get Tweets with this hashtag. It can take one minute between POST request and GET request for Twitter client to update the Tweets.",
         "parameters": [
           {
             "in": "path",
@@ -56,13 +56,13 @@
         ],
         "responses": {
           "200": {
-            "description": "10 Tweets with wanted hashtag"
+            "description": "10 Tweets with wanted hashtag."
           },
           "400": {
-            "description": "Database does not contain tweets with this hashtag"
+            "description": "Database does not contain tweets with this hashtag."
           },
           "502": {
-            "description": "Unable to connect to the database"
+            "description": "Unable to connect to the database!"
           }
         }
       }
@@ -72,7 +72,7 @@
         "tags": [
           "Voting"
         ],
-        "description": "Post a Tweet ID you want to vote for",
+        "description": "Post a Tweet ID you want to vote for.",
         "requestBody": {
           "required": true,
           "content": {
@@ -91,10 +91,10 @@
         },
         "responses": {
           "200": {
-            "description": "Tweet with id x has x votes"
+            "description": "Tweet with id x has x votes."
           },
           "502": {
-            "description": "Unable to connect to the database"
+            "description": "Unable to connect to the database!"
           }
         }
       }
