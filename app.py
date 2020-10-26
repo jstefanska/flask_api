@@ -1,6 +1,5 @@
-from flask import Flask, abort, make_response, jsonify, request
+from flask import Flask, abort, make_response, jsonify, request, render_template
 import json
-from flask_swagger import swagger
 import redis
 import os
 
@@ -8,8 +7,8 @@ app = Flask(__name__)
 
 
 @app.route("/")
-def spec():
-    return jsonify(swagger(app))
+def swagger_ui():
+    return render_template('swaggerui.html')
 
 
 @app.route('/hashtag', methods=['POST'])
@@ -123,7 +122,7 @@ def vote_tweet_id():
         r.incr(tweet_id, 1)
         votes = r.get(tweet_id)
 
-        if int(votes) > 2:
+        if int(votes) > 1:
             return "Tweet with id: " + tweet_id + " has " + votes + " votes."
         else:
             return "Tweet with id: " + tweet_id + " has " + votes + " vote."
