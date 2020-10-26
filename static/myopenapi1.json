@@ -1,0 +1,103 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Flask API for Twitter client",
+    "description": "An API to POST hashtags, GET tweets and POST tweet_id to vote"
+  },
+  "paths": {
+    "/hashtag": {
+      "post": {
+        "tags": [
+          "Hashtag"
+        ],
+        "description": "Post Twitter hashtag without \"#\", so that Twitter client can get tweets with this hashtag",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "example": "puppy"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Database updated with hashtag"
+          },
+          "502": {
+            "description": "Unable to connect to the database"
+          }
+        }
+      }
+    },
+    "/tweets/{hashtag}": {
+      "get": {
+        "tags": [
+          "Tweets"
+        ],
+        "description": "Provide hashtag for Tweet you want to look up, so that Twitter client can get Tweets with this hashtag. It can take one minute between POST request and GET request.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hashtag",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "10 Tweets with wanted hashtag"
+          },
+          "400": {
+            "description": "Database does not contain tweets with this hashtag"
+          },
+          "502": {
+            "description": "Unable to connect to the database"
+          }
+        }
+      }
+    },
+    "/vote": {
+      "post": {
+        "tags": [
+          "Voting"
+        ],
+        "description": "Post a Tweet ID you want to vote for",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "value": {
+                    "type": "string",
+                    "example": "123456789"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tweet with id x has x votes"
+          },
+          "502": {
+            "description": "Unable to connect to the database"
+          }
+        }
+      }
+    }
+  }
+}
