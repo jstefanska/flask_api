@@ -15,15 +15,15 @@ With this API, you can POST a hashtag with which you want to find Tweets, GET Tw
 E.g.:
 - POST curl to add hashtag "doggo" for Windows
 
-curl -i -X POST -H "Content-Type: application/json" -d "{\"value\":\"doggo\"}" http://127.0.0.1:5000/hashtag
+  curl -i -X POST -H "Content-Type: application/json" -d "{\"value\":\"doggo\"}" http://127.0.0.1:5000/hashtag
 
 - GET curl with header to get tweets with hashtag "doggo" for Windows
 
-curl -i -H "Accept: application/json" http://127.0.0.1:5000/tweets/doggo
+  curl -i -H "Accept: application/json" http://127.0.0.1:5000/tweets/doggo
 
 - POST curl to vote for Tweet with chosen ID
 
-curl -i -X POST -H "Content-Type: application/json" -d "{\"value\":\"1234784584443\"}" http://127.0.0.1:5000/vote
+  curl -i -X POST -H "Content-Type: application/json" -d "{\"value\":\"1234784584443\"}" http://127.0.0.1:5000/vote
 
 You can run it easily with Swagger UI - templates and static files for Swagger UI can be found in the project.
 
